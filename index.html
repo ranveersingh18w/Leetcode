@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriTrace - Track Your Herbal Products</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .floating-leaf {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0 100% 0 100%;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00c853, #64dd17);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .tagline {
+            color: #666;
+            margin-top: 10px;
+            font-size: 1.1em;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .hero p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
+
+        /* Feature Cards */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* Supply Chain Timeline */
+        .timeline {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 30px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .timeline h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 40px;
+            font-size: 2em;
+        }
+
+        .timeline-container {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+            opacity: 0;
+            animation: slideIn 0.5s forwards;
+        }
+
+        .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+        .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+        .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+        .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .timeline-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .timeline-content {
+            margin-left: 30px;
+            flex: 1;
+        }
+
+        .timeline-content h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .timeline-content p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* Problems & Solutions */
+        .problems {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 30px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .problem-card {
+            padding: 20px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .problem-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .problem-card h4 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .problem-card p {
+            font-size: 0.95em;
+            opacity: 0.95;
+        }
+
+        /* CTA Section */
+        .cta {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .cta h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Interactive Demo */
+        .demo {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 30px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .qr-scanner {
+            width: 200px;
+            height: 200px;
+            margin: 30px auto;
+            border: 3px dashed #667eea;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .qr-scanner:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: scale(1.05);
+        }
+
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #667eea;
+            top: 0;
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            from { top: 0; }
+            to { top: 100%; }
+        }
+
+        .result-box {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            border-radius: 15px;
+            color: #333;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo { font-size: 2em; }
+            .hero h1 { font-size: 1.5em; }
+            .timeline-icon { width: 60px; height: 60px; font-size: 1.5em; }
+            .cta-buttons { flex-direction: column; align-items: center; }
+            .btn { width: 100%; max-width: 300px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-leaf" style="left: 10%; animation-delay: 0s;"></div>
+        <div class="floating-leaf" style="left: 25%; animation-delay: 3s;"></div>
+        <div class="floating-leaf" style="left: 40%; animation-delay: 6s;"></div>
+        <div class="floating-leaf" style="left: 55%; animation-delay: 9s;"></div>
+        <div class="floating-leaf" style="left: 70%; animation-delay: 12s;"></div>
+        <div class="floating-leaf" style="left: 85%; animation-delay: 15s;"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">🌿 AgriTrace</div>
+        <p class="tagline">Track Your Herbs - From Farm to Home</p>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Safe & Real Herbal Products</h1>
+            <p>Know where your herbs come from! Our app uses special technology to track every step - from the farmer who grew them to your hands. No fake products, just pure herbs you can trust.</p>
+        </section>
+
+        <!-- Feature Cards -->
+        <section class="features">
+            <div class="card" onclick="animateCard(this)">
+                <div class="card-icon">👨‍🌾</div>
+                <h3>For Farmers</h3>
+                <p>Easy app to add your crops. Just take a photo, get a special code, and start selling!</p>
+            </div>
+            <div class="card" onclick="animateCard(this)">
+                <div class="card-icon">📦</div>
+                <h3>For Centers</h3>
+                <p>Check weight, pack herbs, and add info that can't be changed. Everything is recorded safely.</p>
+            </div>
+            <div class="card" onclick="animateCard(this)">
+                <div class="card-icon">👤</div>
+                <h3>For You</h3>
+                <p>Scan the code on any product. See its full journey - who grew it, when, and where!</p>
+            </div>
+        </section>
+
+        <!-- Supply Chain Timeline -->
+        <section class="timeline">
+            <h2>How Your Herbs Travel</h2>
+            <div class="timeline-container">
+                <div class="timeline-item">
+                    <div class="timeline-icon">🌱</div>
+                    <div class="timeline-content">
+                        <h4>Farm</h4>
+                        <p>Farmer grows herbs and adds them to our app with photos</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">🚚</div>
+                    <div class="timeline-content">
+                        <h4>Collection</h4>
+                        <p>Herbs are collected, weighed, and given a tracking code</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">🏭</div>
+                    <div class="timeline-content">
+                        <h4>Making</h4>
+                        <p>Herbs are cleaned and packed. Each step is saved</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">✅</div>
+                    <div class="timeline-content">
+                        <h4>Testing</h4>
+                        <p>Quality check to make sure herbs are pure and safe</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">🛒</div>
+                    <div class="timeline-content">
+                        <h4>Your Home</h4>
+                        <p>You scan and see the whole story of your herbs!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Problems & Solutions -->
+        <section class="problems">
+            <h2 style="text-align: center; color: #333; margin-bottom: 20px;">We Stop These Problems</h2>
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <h4>❌ Fake Products</h4>
+                    <p>✓ Every product has a special code that can't be copied</p>
+                </div>
+                <div class="problem-card">
+                    <h4>❌ Changed Records</h4>
+                    <p>✓ Once saved, no one can change the info</p>
+                </div>
+                <div class="problem-card">
+                    <h4>❌ Mixed Quality</h4>
+                    <p>✓ Each batch is tracked separately</p>
+                </div>
+                <div class="problem-card">
+                    <h4>❌ False Reports</h4>
+                    <p>✓ Digital proof for every check</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Challenges -->
+        <section class="problems" style="background-color: #f0f4f8;">
+            <h2 style="text-align: center; color: #333; margin-bottom: 20px;">Technical Questions We Need to Solve</h2>
+            <div class="problem-grid">
+                <div class="problem-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <h4>🤔 One App or Many?</h4>
+                    <p>Should we make one app for everyone (farmers, testers, packers) or separate apps for each role?</p>
+                </div>
+                <div class="problem-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    <h4>🔑 Single or Multi-Key?</h4>
+                    <p>Should one tracking code be used for the whole product journey, or new codes at each step?</p>
+                </div>
+                <div class="problem-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <h4>🛡️ Data Integrity</h4>
+                    <p>What if a user adds fake info? How do we verify that only authorized people add real data?</p>
+                </div>
+                <div class="problem-card" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                    <h4>📱 Adaptive UI</h4>
+                    <p>Different users need different screens. How do we design a user interface that's simple for everyone?</p>
+                </div>
+                <div class="problem-card" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
+                    <h4>💾 Data Scalability</h4>
+                    <p>How do we store data for millions of products efficiently and securely?</p>
+                </div>
+                <div class="problem-card" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);">
+                    <h4>🌐 Offline Access</h4>
+                    <p>How can users in remote areas record data without internet and sync it later?</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Demo -->
+        <section class="demo">
+            <h2 style="color: #333; margin-bottom: 20px;">Try It Now!</h2>
+            <p style="color: #666; margin-bottom: 20px;">Click to scan a product code</p>
+            <div class="qr-scanner" onclick="scanQR()">
+                <div class="scan-line"></div>
+                📷
+            </div>
+            <div class="result-box" id="resultBox">
+                <h3>Product Found! ✅</h3>
+                <p><strong>Product:</strong> Pure Tulsi Leaves</p>
+                <p><strong>Farmer:</strong> Raju from Village Green</p>
+                <p><strong>Grown:</strong> 15 days ago</p>
+                <p><strong>Tested:</strong> 100% Pure</p>
+                <p><strong>Journey:</strong> Farm → Center → Testing → Store → You!</p>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta">
+            <h2>Start Using AgriTrace Today!</h2>
+            <p style="color: #666; margin-bottom: 20px;">Join thousands who trust their herbs</p>
+            <div class="cta-buttons">
+                <button class="btn btn-primary" onclick="showAlert('farmer')">I'm a Farmer</button>
+                <button class="btn btn-secondary" onclick="showAlert('consumer')">I Buy Herbs</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Animate cards on click
+        function animateCard(card) {
+            card.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                card.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        // Simulate QR scanning
+        function scanQR() {
+            const scanner = document.querySelector('.qr-scanner');
+            const resultBox = document.getElementById('resultBox');
+            
+            scanner.style.animation = 'pulse 0.5s';
+            setTimeout(() => {
+                scanner.style.animation = '';
+                resultBox.style.display = 'block';
+            }, 500);
+        }
+
+        // Show alerts for CTAs
+        function showAlert(type) {
+            if (type === 'farmer') {
+                alert('Welcome Farmer! 🌾\n\nDownload our app to:\n• Add your crops easily\n• Get better prices\n• Connect with buyers directly\n\nComing soon to your phone!');
+            } else {
+                alert('Welcome! 🛒\n\nWith AgriTrace you can:\n• Check if products are real\n• Know your farmer\n• Buy with confidence\n\nDownload the app to start scanning!');
+            }
+        }
+
+        // Add some interactive animations on scroll
+        window.addEventListener('scroll', () => {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        // Create more floating leaves dynamically
+        setInterval(() => {
+            const leaf = document.createElement('div');
+            leaf.className = 'floating-leaf';
+            leaf.style.left = Math.random() * 100 + '%';
+            leaf.style.animationDelay = '0s';
+            leaf.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            document.querySelector('.bg-animation').appendChild(leaf);
+            
+            setTimeout(() => leaf.remove(), 20000);
+        }, 3000);
+    </script>
+</body>
+</html>
